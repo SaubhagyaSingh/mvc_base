@@ -24,8 +24,12 @@ class _HomeState extends State<Home> {
             glow: 1,
             width: screenWidth,
             height: screenHeight,
-            backgroundColor: Colors.black,
-            glowColor: Colors.blueAccent,
+            glowColors: [
+              Colors.blueAccent,
+              Colors.purpleAccent,
+              Colors.redAccent,
+              Colors.greenAccent
+            ],
           ),
 
           // Page content

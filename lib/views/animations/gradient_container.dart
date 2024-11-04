@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 
-class GradientContainer extends StatelessWidget {
+class GradientContainer extends StatefulWidget {
   final double height;
   final double width;
   final Color backgroundColor;
-  final Color glowColor;
   final double glow;
   final BorderRadiusGeometry radius;
+  final List<Color> glowColors; // List of colors for the animation
 
   const GradientContainer({
     Key? key,
@@ -14,41 +14,84 @@ class GradientContainer extends StatelessWidget {
     required this.width,
     required this.glow,
     required this.radius,
+    required this.glowColors, // User-specified colors
     this.backgroundColor = Colors.black,
-    this.glowColor = Colors.blueAccent,
   }) : super(key: key);
 
   @override
+  State<GradientContainer> createState() => _GradientContainerState();
+}
+
+class _GradientContainerState extends State<GradientContainer>
+    with SingleTickerProviderStateMixin {
+  late AnimationController _controller;
+  late Animation<Color?> _colorAnimation;
+
+  @override
+  void initState() {
+    super.initState();
+
+    // Initialize the animation controller
+    _controller = AnimationController(
+      duration: const Duration(seconds: 6),
+      vsync: this,
+    )..repeat();
+
+    // Create a TweenSequence to cycle through the specified colors
+    _colorAnimation = TweenSequence<Color?>(
+      [
+        for (int i = 0; i < widget.glowColors.length; i++)
+          TweenSequenceItem(
+            tween: ColorTween(
+              begin: widget.glowColors[i],
+              end: widget.glowColors[(i + 1) % widget.glowColors.length],
+            ),
+            weight: 1.0,
+          ),
+      ],
+    ).animate(_controller);
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    return Container(
-      width: width,
-      height: height,
-      decoration: BoxDecoration(
-        // Soft internal background color gradient
-        gradient: RadialGradient(
-          colors: [
-            glowColor.withOpacity(0.1), // Soft glow color
-            backgroundColor, // Center color for soft background
-          ],
-          radius: glow, // Controls spread of inner gradient
-          center: Alignment.center,
-        ),
-        borderRadius: radius,
-        // Neon glow border
-        boxShadow: [
-          BoxShadow(
-            color: glowColor.withOpacity(0.6), // Outer glow
-            blurRadius: glow * 4, // Adjust for neon effect
-            spreadRadius: glow, // Spread for intensity
+    return AnimatedBuilder(
+      animation: _colorAnimation,
+      builder: (context, child) {
+        return Container(
+          width: widget.width,
+          height: widget.height,
+          decoration: BoxDecoration(
+            gradient: RadialGradient(
+              colors: [
+                _colorAnimation.value!.withOpacity(0.1),
+                widget.backgroundColor,
+              ],
+              radius: widget.glow,
+              center: Alignment.center,
+            ),
+            borderRadius: widget.radius,
+            boxShadow: [
+              BoxShadow(
+                color: _colorAnimation.value!.withOpacity(0.6),
+                blurRadius: widget.glow * 4,
+                spreadRadius: widget.glow,
+              ),
+              BoxShadow(
+                color: _colorAnimation.value!.withOpacity(0.4),
+                blurRadius: widget.glow * 2,
+                spreadRadius: widget.glow / 2,
+              ),
+            ],
           ),
-          BoxShadow(
-            color: glowColor.withOpacity(0.4), // Inner glow
-            blurRadius: glow * 2,
-            spreadRadius: glow / 2,
-          ),
-        ],
-      ),
-      padding: const EdgeInsets.all(20),
+          padding: const EdgeInsets.all(20),
+        );
+      },
     );
   }
 }
