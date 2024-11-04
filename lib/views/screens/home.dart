@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
-import 'animations/gradient_container.dart';
+import '../../routes/routes.dart';
+import '../animations/gradient_container.dart';
+import '../animations/shiny_button.dart';
 
 class Home extends StatefulWidget {
   const Home({super.key});
@@ -92,23 +94,13 @@ class _HomeState extends State<Home> {
                   // Get Started Button
                   const SizedBox(height: 20),
 
-                  Center(
-                    child: ElevatedButton(
-                      onPressed: () {},
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.blueAccent,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(10),
-                        ),
-                        padding: const EdgeInsets.symmetric(
-                          vertical: 16,
-                          horizontal: 24,
-                        ),
-                      ),
-                      child: const Text(
-                        'Get Started',
-                        style: TextStyle(fontSize: 18, color: Colors.white),
-                      ),
+                  const Center(
+                    child: ShinyButton(
+                      route: AppRoutes.animationList,
+                      borderRadius: 25,
+                      height: 60,
+                      width: 200,
+                      text: 'Get Started',
                     ),
                   ),
                   const SizedBox(height: 40),
